@@ -3,9 +3,14 @@ package com.mini_project.thesilentbell.quizit;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -85,14 +90,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setDataToViews(int currentPos) {
-        questionNumberTV.setText("Questions Attempted: " + questionAttempted);
+    private void showBottomSheet(){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(MainActivity.this);
+        View BottomSheetView = LayoutInflater.from (getApplicationContext()).inflate(R.layout.score_bottom_sheet,(LinearLayout)findViewById(R.id.LLscore));
+        TextView scoreTV = BottomSheetView.findViewById(R.id.idTVScore);
+        Button restartQuizBtn = BottomSheetView.findViewById(R.id.idBtnRestart);
+        scoreTV.setText("Your Score is\n" + currentScore + "/5");
+        restartQuizBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentPos = random.nextInt(quizModalArrayList.size());
+                setDataToViews(currentPos);
+                questionAttempted = 1;
+                currentScore = 0;
+                bottomSheetDialog.dismiss();
+            }
+        });
+        bottomSheetDialog.setCancelable(false);
+        bottomSheetDialog.setContentView(BottomSheetView);
+        bottomSheetDialog.show();
+    }
 
-        questionTV.setText(quizModalArrayList.get(currentPos).getQuestion());
-        option1Btn.setText(quizModalArrayList.get(currentPos).getOption1());
-        option2Btn.setText(quizModalArrayList.get(currentPos).getOption2());
-        option3Btn.setText(quizModalArrayList.get(currentPos).getOption3());
-        option4Btn.setText(quizModalArrayList.get(currentPos).getOption4());
+    private void setDataToViews(int currentPos) {
+        questionNumberTV.setText("Questions Attempted: " + questionAttempted + "/5");
+        if(questionAttempted == 5){
+            showBottomSheet();
+        }else{
+            questionTV.setText(quizModalArrayList.get(currentPos).getQuestion());
+            option1Btn.setText(quizModalArrayList.get(currentPos).getOption1());
+            option2Btn.setText(quizModalArrayList.get(currentPos).getOption2());
+            option3Btn.setText(quizModalArrayList.get(currentPos).getOption3());
+            option4Btn.setText(quizModalArrayList.get(currentPos).getOption4());
+        }
+
     }
 
     private void getQuizQuestion(ArrayList<QuizModal> quizModalArrayList) {
